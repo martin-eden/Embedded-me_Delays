@@ -15,10 +15,11 @@
   It does not have much sense for microcontrollers but useful
   when interfacing with human.
 
-  Human can estimate time say between 0.2 s and 72 h.
+  Human can estimate time say between 0.2 s and 1.6 s without losing
+  precision.
 
   Point of "sleep" is increase endurance by reducing power.
-  Not precision time delay.
+  Not for precision time delay.
 
   "Sleep" is always goes with "wake up conditions".
 
@@ -40,7 +41,7 @@
 
 ( Precision
 
-  Microseconds-calling cycle compensates for cycle overhead and
+  Microseconds-calling function compensates for cycle overhead and
   setup cost.
 
   Still for 20-microseconds test I've ran with oscilloscope
@@ -57,13 +58,14 @@
     }
 
   I guess that 2.4 micros is time to return from Delay_Us() and
-  reach pin writing instruction in Led.Write(). We can't compensate it.
+  reach pin writing instruction in Led.Write(0). We can't compensate it.
 
   (So no, this module is not suitable for implementing software UART
-  working at 1 megabit speed.)
+  working at 1 megabit speed. That's why we have hardware UART -
+  precision timing.)
 
-  But I've not met device that accepts pulse
-  say only between 48 and 49 micros.
+  But I've not met device that accepts pulse say only between 48 and 49
+  micros.
 
 
   Theoretical precision is 62.5 ns (for 16 MHz).
