@@ -1,0 +1,74 @@
+( Delays
+
+  Typical source code describes what has to be done. It does not
+  describe how long it should take.
+
+  Any communication takes time. No matter how fast you can flip bit
+  on output pin, for communication you need precision, not speed.
+
+) 2025-08-21
+
+( Sleeps
+
+  "Sleep" is human term for inactivity of about 1/3 time of work cycle.
+
+  It does not have much sense for microcontrollers but useful
+  when interfacing with human.
+
+  Human can estimate time say between 0.2 s and 72 h.
+
+  Point of "sleep" is increase endurance by reducing power.
+  Not precision time delay.
+
+  "Sleep" is always goes with "wake up conditions".
+
+) 2025-08-21
+
+( Time
+
+  You cannot measure time without external input.
+
+  Historically "day" is time span between "noons".
+
+  And "noon" is time moment when you observe shortest shadow from pole.
+
+  Without input we are counters. We will count our ticks.
+  But we don't know how often those tick really occur.
+  We hope they occur 16 mils per second (F_CPU value).
+
+) 2025-08-21
+
+( Precision
+
+  Microseconds-calling cycle compensates for cycle overhead and
+  setup cost.
+
+  Still for 20-microseconds test I've ran with oscilloscope
+  time spans are ~ 22.4 us.
+
+  Test is
+
+    while(1)
+    {
+      Led.Write(1);
+      me_Delays::Delay_Us(Led_TimeOn_Us);
+      Led.Write(0);
+      me_Delays::Delay_Us(Led_TimeOff_Us);
+    }
+
+  I guess that 2.4 micros is time to return from Delay_Us() and
+  reach pin writing instruction in Led.Write(). We can't compensate it.
+
+  (So no, this module is not suitable for implementing software UART
+  working at 1 megabit speed.)
+
+  But I've not met device that accepts pulse
+  say only between 48 and 49 micros.
+
+
+  Theoretical precision is 62.5 ns (for 16 MHz).
+
+  You need to use assembly for that time granularity.
+  (It was required for RGB LED stripe on WS2812b chipset.)
+
+) 2025-08-21
