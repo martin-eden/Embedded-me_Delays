@@ -2,17 +2,18 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-08-21
+  Last mod.: 2025-09-12
 */
 
 #pragma once
 
 #include <me_BaseTypes.h>
+#include <me_Timestamp.h>
 
 namespace me_Delays
 {
   /*
-    All delay functions have up to 10x overload capability
+    Single-unit delay functions have up to 10x overload capability
 
     Delay 9050 ms: Delay_Ms(9050) equal to Delay_S(9); Delay_Ms(50);
 
@@ -27,6 +28,9 @@ namespace me_Delays
 
   // Seconds delay
   TBool Delay_S(TUint_2 NumSecs);
+
+  // Delay for duration record
+  TBool Delay_Duration(me_Timestamp::TTimestamp Duration);
 }
 
 /*

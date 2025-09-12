@@ -2,12 +2,14 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-08-21
+  Last mod.: 2025-09-12
 */
 
 #include <me_Delays.h>
 
 #include <me_BaseTypes.h>
+#include <me_Timestamp.h>
+
 #include <me_Delays.Freetown.h>
 
 #include <avr/common.h>
@@ -138,5 +140,51 @@ TBool me_Delays::Delay_S(
 }
 
 /*
+  Delay for duration record
+*/
+TBool me_Delays::Delay_Duration(
+  me_Timestamp::TTimestamp Duration
+)
+{
+  for (TUint_2 RunNumber = 1; RunNumber <= Duration.KiloS; ++RunNumber)
+  {
+    if (!Delay_S(1000))
+      return false;
+  }
+
+  if (!Delay_S(Duration.S))
+    return false;
+
+  if (!Delay_Ms(Duration.MilliS))
+    return false;
+
+  Delay_Us(Duration.MicroS);
+
+  return true;
+
+  /*
+    We're not trying any corrections here
+
+    It's futile. You can't directly measure this function delay
+    with oscilloscope.
+
+    You have code like
+
+      Led.Write(1); // (1)
+      Delay_Duration({ 0, 0, 0, 80 });
+      Led.Write(0); // (2)
+
+    And in oscilloscope you'll see wave goes high somewhere inside (1)
+    and goes low somewhere inside (2).
+
+    We can try compensate time spent in this function. But at the end
+    of day you want to see wave of wished length on oscilloscope.
+
+    For this you need to do duration corrections outside of this code.
+  */
+}
+
+/*
   2025-08-21
+  2025-09-12
 */
