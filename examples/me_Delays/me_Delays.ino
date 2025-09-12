@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-08-21
+  Last mod.: 2025-09-12
 */
 
 #include <me_Delays.h>
@@ -10,6 +10,7 @@
 #include <me_BaseTypes.h>
 #include <me_Console.h>
 #include <me_Pins.h>
+#include <me_Timestamp.h>
 
 void RunTest()
 {
@@ -49,11 +50,9 @@ void RunTest()
 */
 void RunInifiniteTest()
 {
-  const TUint_2
-    Led_TimeOn_Us = 20,
-    Led_TimeOff_Us = 20;
-
   const TUint_1 Led_Pin = 13;
+  const me_Timestamp::TTimestamp
+    Led_Wave_Duration = { 0, 0, 0, 160 };
 
   me_Pins::TOutputPin Led;
 
@@ -63,9 +62,9 @@ void RunInifiniteTest()
   while(1)
   {
     Led.Write(1);
-    me_Delays::Delay_Us(Led_TimeOn_Us);
+    me_Delays::Delay_Duration(Led_Wave_Duration);
     Led.Write(0);
-    me_Delays::Delay_Us(Led_TimeOff_Us);
+    me_Delays::Delay_Duration(Led_Wave_Duration);
   }
 }
 
@@ -87,4 +86,5 @@ void loop()
 
 /*
   2025-08-21
+  2025-09-12
 */
