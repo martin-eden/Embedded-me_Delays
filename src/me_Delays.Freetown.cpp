@@ -20,7 +20,7 @@
     Damn, for 16 MHz it's easier to hardcode and tune delay
     than to code and tune delay loops.
 
-    Number of nops reflect costs for CALL and RET for this function.
+    Number of nops account cost of CALL and RET for this function.
   */
   asm volatile
   (
