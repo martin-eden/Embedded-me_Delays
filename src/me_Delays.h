@@ -2,13 +2,13 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-09-12
+  Last mod.: 2025-09-20
 */
 
 #pragma once
 
 #include <me_BaseTypes.h>
-#include <me_Timestamp.h>
+#include <me_Duration.h>
 
 namespace me_Delays
 {
@@ -30,7 +30,7 @@ namespace me_Delays
   TBool Delay_S(TUint_2 NumSecs);
 
   // Delay for duration record
-  TBool Delay_Duration(me_Timestamp::TTimestamp Duration);
+  TBool Delay_Duration(me_Duration::TDuration Duration);
 }
 
 /*

@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-09-12
+  Last mod.: 2025-09-20
 */
 
 #include <me_Delays.h>
@@ -10,7 +10,7 @@
 #include <me_BaseTypes.h>
 #include <me_Console.h>
 #include <me_Pins.h>
-#include <me_Timestamp.h>
+#include <me_Duration.h>
 
 void RunTest()
 {
@@ -51,7 +51,7 @@ void RunTest()
 void RunInifiniteTest()
 {
   const TUint_1 Led_Pin = 13;
-  const me_Timestamp::TTimestamp
+  const me_Duration::TDuration
     Led_Wave_Duration = { 0, 0, 0, 160 };
 
   me_Pins::TOutputPin Led;

@@ -2,13 +2,13 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-09-12
+  Last mod.: 2025-09-20
 */
 
 #include <me_Delays.h>
 
 #include <me_BaseTypes.h>
-#include <me_Timestamp.h>
+#include <me_Duration.h>
 
 #include <me_Delays.Freetown.h>
 
@@ -143,7 +143,7 @@ TBool me_Delays::Delay_S(
   Delay for duration record
 */
 TBool me_Delays::Delay_Duration(
-  me_Timestamp::TTimestamp Duration
+  me_Duration::TDuration Duration
 )
 {
   for (TUint_2 RunNumber = 1; RunNumber <= Duration.KiloS; ++RunNumber)
