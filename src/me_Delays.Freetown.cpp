@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-08-30
+  Last mod.: 2025-10-20
 */
 
 #include <me_Delays.Freetown.h>
@@ -60,7 +60,7 @@
 */
 [[gnu::noinline]] void me_Delays::Freetown::DelaySecond()
 {
-  const TUint_2 NumRuns = 1000;
+  const TUint_2 NumRuns = 999;
 
   for (TUint_2 RunNumber = 1; RunNumber <= NumRuns; ++RunNumber)
   {
