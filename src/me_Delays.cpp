@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-09-20
+  Last mod.: 2025-10-24
 */
 
 #include <me_Delays.h>
@@ -74,12 +74,16 @@ const TUint_2 MaxCapacity = 9999;
 
       "sbiw" cost is 2, "brne" 2. "call"'s cost is already accounted.
 
+    16 ?
+
+      One microsecond is 16 ticks at 16 MHz
+
     So
 
       Num runs = Num micros * 16 / 20
 
-    There also should be setup cost time constant, we're
-    subtracting it.
+    There also should be setup cost time constant,
+    we're subtracting it.
   */
 }
 

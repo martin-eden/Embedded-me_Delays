@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-20
+  Last mod.: 2025-10-24
 */
 
 #include <me_Delays.Freetown.h>
@@ -20,7 +20,7 @@
     Damn, for 16 MHz it's easier to hardcode and tune delay
     than to code and tune delay loops.
 
-    Number of nops account cost of CALL and RET for this function.
+    Number of NOPs account for costs of CALL and RET for this function.
   */
   asm volatile
   (
