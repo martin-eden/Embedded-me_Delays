@@ -74,3 +74,74 @@
   (It was required for RGB LED stripe on WS2812b chipset.)
 
 ) 2025-08-21
+
+(
+  Delays are not trivial
+
+  Okay, we have DelayMicrosecond() function that does exactly
+  one microsecond delay per call.
+
+  ( Well, only for hardcoded 16 MHz frequency. )
+
+  You can do two microseconds delay by two hardcoded calls.
+
+  You write "for" cycle for delays from 1 to 100. And you'll discover
+  that execution takes longer time. Because of cycle overhead.
+  You can compensate it tho.
+
+  Can you do longer delays?
+
+) 2025-10-24
+
+(
+  Longer delays problem
+
+  We have run-time clock. It's interrupt handler too.
+  On hardware counter event. It advances tracked run time.
+  And that code takes some time.
+
+  We have it because event handlers are interrupt handlers and
+  they need run time to register their event.
+
+  If you implement DelaySecond() as million calls of DelayMicrosecond()
+  actual time will be longer. Because your code will be diluted by
+  code of run-time interrupt handler.
+
+  If you disable interrupts for DelaySecond(), your delay will become
+  precise. But you fucked up system clock. And registered events
+  will get wrong time.
+
+  Wrong time defeats purpose of run-time tracking. You can no longer
+  rely that you can replay events.
+
+) 2025-10-24
+
+(
+  Longer delays solution
+
+  Say you have date with girl in Constantinople at 53 days 16 hours
+  7 minutes and 53 seconds from this time.
+
+  You don't need to check time every second of this period.
+
+  You can calculate date's time now and then spend ordinary 53 days.
+  Then you start tracking hours, minutes and seconds.
+
+  We're doing similar thing. For longer delays we're spending time
+  just watching at run-time clock. No interrupts disabled. Then we
+  disable interrupts and do final stride.
+
+  (
+    Run-time clock event here and now ticks every millisecond.
+    Disabling interrupts does not stop it's counter. Time update
+    event will be registered when it occurs. And will be processed
+    when you enable interrupts back.
+
+    But you can disable interrupts only for less than one millisecond.
+    Or else two time update events may occur and only one of them
+    will be processed. Because it's bit flag.
+  )
+
+  But she'll be waiting you in Istanbul.
+
+) 2025-10-24
