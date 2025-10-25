@@ -2,22 +2,48 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-24
+  Last mod.: 2025-10-25
 */
 
 #include <me_Delays.h>
 
 #include <me_BaseTypes.h>
+
 #include <me_Duration.h>
-
-#include <me_Delays.Freetown.h>
-
-#include <avr/common.h>
-#include <avr/interrupt.h>
+#include <me_RunTime.h>
 
 using namespace me_Delays;
 
 const TUint_2 MaxCapacity = 9999;
+
+/*
+  Delay for one microsecond
+*/
+[[gnu::noinline]] void me_Delays::Freetown::DelayMicrosecond()
+{
+  /*
+    For 16 MHz
+
+    Damn, for 16 MHz it's easier to hardcode and tune delay
+    than to code and tune delay loops.
+
+    Number of NOPs account for costs of CALL and RET for this function.
+  */
+  asm volatile
+  (
+    R"(
+      nop
+      nop
+      nop
+      nop
+
+      nop
+      nop
+      nop
+      nop
+    )"
+  );
+}
 
 /*
   Delay for given amount of microseconds
@@ -44,16 +70,8 @@ const TUint_2 MaxCapacity = 9999;
   // See note at end of function
   TUint_2 NumRuns = (TUint_4) NumMicros * 16 / 20 - SetupCost_Us;
 
-  TUint_1 OrigSreg = SREG;
-
-  cli();
-
   for (TUint_2 RunNumber = 1; RunNumber <= NumRuns; ++RunNumber)
-  {
     Freetown::DelayMicrosecond();
-  }
-
-  SREG = OrigSreg;
 
   return true;
 
@@ -88,59 +106,12 @@ const TUint_2 MaxCapacity = 9999;
 }
 
 /*
-  Delay for given amount of milliseconds
+  Start run-time tracker that we're using
 */
-TBool me_Delays::Delay_Ms(
-  TUint_2 NumMillis
-)
+void me_Delays::Init()
 {
-  /*
-    For millis we ignore cycle overhead. It's under 2 us
-  */
-
-  if (NumMillis == 0)
-    return true;
-
-  if (NumMillis > MaxCapacity)
-    return false;
-
-  TUint_1 OrigSreg = SREG;
-
-  cli();
-
-  for (TUint_2 RunNumber = 1; RunNumber <= NumMillis; ++RunNumber)
-  {
-    Freetown::DelayMillisecond();
-  }
-
-  SREG = OrigSreg;
-
-  return true;
-}
-
-/*
-  Delay for given amount of seconds
-*/
-TBool me_Delays::Delay_S(
-  TUint_2 NumSecs
-)
-{
-  /*
-    For seconds we're not disabling interrupts
-  */
-
-  if (NumSecs == 0)
-    return true;
-
-  if (NumSecs > MaxCapacity)
-    return false;
-
-  for (TUint_2 RunNumber = 1; RunNumber <= NumSecs; ++RunNumber)
-  {
-    Freetown::DelaySecond();
-  }
-
-  return true;
+  me_RunTime::Init();
+  me_RunTime::Start();
 }
 
 /*
@@ -150,42 +121,41 @@ TBool me_Delays::Delay_Duration(
   me_Duration::TDuration Duration
 )
 {
-  for (TUint_2 RunNumber = 1; RunNumber <= Duration.KiloS; ++RunNumber)
-  {
-    if (!Delay_S(1000))
-      return false;
-  }
+  me_Duration::TDuration StartTime;
+  me_Duration::TDuration EndTime_Trimmed;
+  TUint_2 EndTime_Micros;
 
-  if (!Delay_S(Duration.S))
+  StartTime = me_RunTime::GetTime_Precise();
+
+  EndTime_Trimmed = StartTime;
+  if (!me_Duration::Add(&EndTime_Trimmed, Duration))
     return false;
+  EndTime_Micros = EndTime_Trimmed.MicroS;
+  EndTime_Trimmed.MicroS = 0;
 
-  if (!Delay_Ms(Duration.MilliS))
-    return false;
+  while (me_Duration::IsLessOrEqual(me_RunTime::GetTime(), EndTime_Trimmed));
 
-  Delay_Us(Duration.MicroS);
+  return Delay_Us(EndTime_Micros);
+}
 
-  return true;
+/*
+  Delay for given amount of milliseconds
+*/
+TBool me_Delays::Delay_Ms(
+  TUint_2 NumMillis
+)
+{
+  return Delay_Duration({ 0, 0, NumMillis, 0 });
+}
 
-  /*
-    We're not trying any corrections here
-
-    It's futile. You can't directly measure this function delay
-    with oscilloscope.
-
-    You have code like
-
-      Led.Write(1); // (1)
-      Delay_Duration({ 0, 0, 0, 80 });
-      Led.Write(0); // (2)
-
-    And in oscilloscope you'll see wave goes high somewhere inside (1)
-    and goes low somewhere inside (2).
-
-    We can try compensate time spent in this function. But at the end
-    of day you want to see wave of wished length on oscilloscope.
-
-    For this you need to do duration corrections outside of this code.
-  */
+/*
+  Delay for given amount of seconds
+*/
+TBool me_Delays::Delay_S(
+  TUint_2 NumSecs
+)
+{
+  return Delay_Duration({ 0, NumSecs, 0, 0 });
 }
 
 /*

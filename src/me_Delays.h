@@ -21,6 +21,9 @@ namespace me_Delays
     But delay 10050 ms is done only by "Delay_S(10); Delay_Ms(50);".
   */
 
+  // Init
+  void Init();
+
   // Microseconds delay
   TBool Delay_Us(TUint_2 NumMicros);
 
@@ -32,8 +35,15 @@ namespace me_Delays
 
   // Delay for duration record
   TBool Delay_Duration(me_Duration::TDuration Duration);
+
+  namespace Freetown
+  {
+    // Delay for one microsecond
+    void DelayMicrosecond();
+  }
 }
 
 /*
   2025-08-21
+  2025-10-25
 */
