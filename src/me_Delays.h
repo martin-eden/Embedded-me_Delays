@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-09-20
+  Last mod.: 2025-09-25
 */
 
 #pragma once
@@ -13,11 +13,12 @@
 namespace me_Delays
 {
   /*
-    Single-unit delay functions have up to 10x overload capability
+    Max value for single-unit delay functions is 9999
 
-    Delay 9050 ms: Delay_Ms(9050) equal to Delay_S(9); Delay_Ms(50);
+    For 9050 ms delay you can use "Delay_Ms(9050);" or
+    "Delay_S(9); Delay_Ms(50);".
 
-    But delay 10050 ms only equal to Delay_S(10); Delay_Ms(50);
+    But delay 10050 ms is done only by "Delay_S(10); Delay_Ms(50);".
   */
 
   // Microseconds delay
