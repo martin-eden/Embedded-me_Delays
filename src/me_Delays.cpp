@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-25
+  Last mod.: 2025-10-26
 */
 
 #include <me_Delays.h>
@@ -11,6 +11,9 @@
 
 #include <me_Duration.h>
 #include <me_RunTime.h>
+
+#include <avr/common.h>
+#include <avr/interrupt.h>
 
 using namespace me_Delays;
 
@@ -59,6 +62,11 @@ const TUint_2 MaxCapacity = 9999;
     to adjust for setup and cycle overhead.
   */
 
+  TUint_1 OrigSreg;
+
+  OrigSreg = SREG;
+  cli();
+
   const TUint_2 SetupCost_Us = 3;
 
   if (NumMicros <= SetupCost_Us)
@@ -72,6 +80,8 @@ const TUint_2 MaxCapacity = 9999;
 
   for (TUint_2 RunNumber = 1; RunNumber <= NumRuns; ++RunNumber)
     Freetown::DelayMicrosecond();
+
+  SREG = OrigSreg;
 
   return true;
 
@@ -125,6 +135,11 @@ TBool me_Delays::Delay_Duration(
   me_Duration::TDuration EndTime_Trimmed;
   TUint_2 EndTime_Micros;
 
+  const me_Duration::TDuration OneMilli = { 0, 0, 1, 0 };
+
+  if (me_Duration::IsLess(Duration, OneMilli))
+    return Delay_Us(Duration.MicroS);
+
   StartTime = me_RunTime::GetTime_Precise();
 
   EndTime_Trimmed = StartTime;
@@ -133,7 +148,7 @@ TBool me_Delays::Delay_Duration(
   EndTime_Micros = EndTime_Trimmed.MicroS;
   EndTime_Trimmed.MicroS = 0;
 
-  while (me_Duration::IsLessOrEqual(me_RunTime::GetTime(), EndTime_Trimmed));
+  while (me_Duration::IsLess(me_RunTime::GetTime(), EndTime_Trimmed));
 
   return Delay_Us(EndTime_Micros);
 }
@@ -161,4 +176,6 @@ TBool me_Delays::Delay_S(
 /*
   2025-08-21
   2025-09-12
+  2025-10-25
+  2025-10-26
 */
