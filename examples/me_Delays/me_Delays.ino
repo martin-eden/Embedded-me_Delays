@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-25
+  Last mod.: 2025-10-26
 */
 
 #include <me_Delays.h>
@@ -20,10 +20,11 @@ void RunTest()
   /*
     We're turning ON output pin for constant amount of time.
     We're turning OFF output pin for constant amount of time.
+    Then we're doubling durations and repeat it once.
   */
-  const TUint_2 Led_TimeOn_Ms = 50;
-  const TUint_2 Led_TimeOff_Ms = 10;
-  const TUint_1 NumRuns = 2;
+  TUint_2 Led_TimeOn_Ms = 20;
+  TUint_2 Led_TimeOff_Ms = 10;
+  TUint_1 StageDelay_Ms = 5;
 
   me_Pins::TOutputPin OutputPin;
 
@@ -32,18 +33,31 @@ void RunTest()
   me_DebugPrints::Print("Output pin", OutputPinNum);
   me_DebugPrints::Print("Time ON (ms)", Led_TimeOn_Ms);
   me_DebugPrints::Print("Time OFF (ms)", Led_TimeOff_Ms);
-  me_DebugPrints::Print("Number of runs", NumRuns);
 
   OutputPin.Init(OutputPinNum);
   OutputPin.Write(0);
+  me_Delays::Delay_Ms(StageDelay_Ms);
 
-  for (TUint_1 RunNumber = 1; RunNumber <= NumRuns; ++RunNumber)
-  {
-    OutputPin.Write(1);
-    me_Delays::Delay_Ms(Led_TimeOn_Ms);
-    OutputPin.Write(0);
-    me_Delays::Delay_Ms(Led_TimeOff_Ms);
-  }
+  OutputPin.Write(1);
+  me_Delays::Delay_Ms(Led_TimeOn_Ms);
+  OutputPin.Write(0);
+  me_Delays::Delay_Ms(Led_TimeOff_Ms);
+  OutputPin.Write(1);
+  me_Delays::Delay_Ms(StageDelay_Ms);
+
+  OutputPin.Write(0);
+  Led_TimeOn_Ms = 2 * Led_TimeOn_Ms;
+  Led_TimeOff_Ms = 2 * Led_TimeOff_Ms;
+  me_Delays::Delay_Ms(StageDelay_Ms);
+
+  OutputPin.Write(1);
+  me_Delays::Delay_Ms(Led_TimeOn_Ms);
+  OutputPin.Write(0);
+  me_Delays::Delay_Ms(Led_TimeOff_Ms);
+  OutputPin.Write(1);
+  me_Delays::Delay_Ms(StageDelay_Ms);
+
+  OutputPin.Write(0);
 
   Console.Print("Done");
   Console.Unindent();
@@ -82,7 +96,7 @@ void setup()
   Console.Print("[me_Delays] test");
 
   RunTest();
-  RunInifiniteTest();
+  // RunInifiniteTest();
 
   Console.Print("Done");
 }
