@@ -131,7 +131,7 @@ TBool me_Delays::Delay_Duration(
   me_Duration::TDuration Duration
 )
 {
-  me_Duration::TDuration StartTime;
+  me_Duration::TDuration CurTime;
   me_Duration::TDuration EndTime_Trimmed;
   TUint_2 EndTime_Micros;
 
@@ -140,9 +140,9 @@ TBool me_Delays::Delay_Duration(
   if (me_Duration::IsLess(Duration, OneMilli))
     return Delay_Us(Duration.MicroS);
 
-  StartTime = me_RunTime::GetTime_Precise();
+  CurTime = me_RunTime::GetTime_Precise();
 
-  EndTime_Trimmed = StartTime;
+  EndTime_Trimmed = CurTime;
   if (!me_Duration::Add(&EndTime_Trimmed, Duration))
     return false;
   EndTime_Micros = EndTime_Trimmed.MicroS;
@@ -150,7 +150,13 @@ TBool me_Delays::Delay_Duration(
 
   while (me_Duration::IsLess(me_RunTime::GetTime(), EndTime_Trimmed));
 
-  return Delay_Us(EndTime_Micros);
+  CurTime = me_RunTime::GetTime_Precise();
+
+  // If we passed end time already, return true
+  if (CurTime.MicroS > EndTime_Micros)
+    return true;
+
+  return Delay_Us(EndTime_Micros - CurTime.MicroS);
 }
 
 /*
