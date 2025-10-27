@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-09-25
+  Last mod.: 2025-09-27
 */
 
 #pragma once
@@ -35,15 +35,10 @@ namespace me_Delays
 
   // Delay for duration record
   TBool Delay_Duration(me_Duration::TDuration Duration);
-
-  namespace Freetown
-  {
-    // Delay for one microsecond
-    void DelayMicrosecond();
-  }
 }
 
 /*
   2025-08-21
   2025-10-25
+  2025-10-27
 */

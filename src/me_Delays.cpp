@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-26
+  Last mod.: 2025-10-27
 */
 
 #include <me_Delays.h>
@@ -12,9 +12,6 @@
 #include <me_Duration.h>
 #include <me_RunTime.h>
 
-#include <avr/common.h>
-#include <avr/interrupt.h>
-
 using namespace me_Delays;
 
 const TUint_2 MaxCapacity = 9999;
@@ -22,13 +19,11 @@ const TUint_2 MaxCapacity = 9999;
 /*
   Delay for one microsecond
 */
-[[gnu::noinline]] void me_Delays::Freetown::DelayMicrosecond()
+extern "C" [[gnu::noinline, gnu::used]] void DelayMicrosecond();
+void DelayMicrosecond()
 {
   /*
     For 16 MHz
-
-    Damn, for 16 MHz it's easier to hardcode and tune delay
-    than to code and tune delay loops.
 
     Number of NOPs account for costs of CALL and RET for this function.
   */
@@ -53,7 +48,7 @@ const TUint_2 MaxCapacity = 9999;
 
   Minimum accepted microseconds: 3
 */
-[[gnu::noinline]] TBool me_Delays::Delay_Us(
+TBool me_Delays::Delay_Us(
   TUint_2 NumMicros
 )
 {
@@ -62,12 +57,12 @@ const TUint_2 MaxCapacity = 9999;
     to adjust for setup and cycle overhead.
   */
 
-  TUint_1 OrigSreg;
+  const TUint_1
+    SetupCost_Us = 3,
+    Micro_Ticks = 16,
+    CycleOverhead_Ticks = 4;
 
-  OrigSreg = SREG;
-  cli();
-
-  const TUint_2 SetupCost_Us = 3;
+  TUint_2 NumRuns;
 
   if (NumMicros <= SetupCost_Us)
     return false;
@@ -76,42 +71,42 @@ const TUint_2 MaxCapacity = 9999;
     return false;
 
   // See note at end of function
-  TUint_2 NumRuns = (TUint_4) NumMicros * 16 / 20 - SetupCost_Us;
+  NumRuns =
+    (TUint_4) (NumMicros - SetupCost_Us) *
+      Micro_Ticks / (Micro_Ticks + CycleOverhead_Ticks);
 
-  for (TUint_2 RunNumber = 1; RunNumber <= NumRuns; ++RunNumber)
-    Freetown::DelayMicrosecond();
+  /*
+    We need asm for
 
-  SREG = OrigSreg;
+      for (TUint_2 RunNumber = 1; RunNumber <= NumRuns; ++RunNumber)
+        Freetown::DelayMicrosecond();
+
+    I'm sick and tired of GCC randomly encoding simple iteration
+    at least two different ways.
+  */
+  DelayMicrosecond();
+  asm volatile
+  (
+    R"(
+      DataLoop_Start:
+
+        call DelayMicrosecond
+
+      DataLoop_Next:
+
+        sbiw %[NumRuns], 1
+        brne DataLoop_Start
+    )"
+    : [NumRuns] "+w" (NumRuns)
+  );
 
   return true;
 
   /*
-    Disassembly-based math
+    Call of DelayMicrosecond() takes <Micro_Ticks>.
 
-      Num micros = Num ticks / 16
-      Num ticks = Num runs * Run execution time (ticks)
-      Run execution time (ticks) = 4 + 16   // 20
-
-    4 ?
-
-      Generated code is
-
-        call 0x274
-        sbiw r28, 0x01
-        brne .-8
-
-      "sbiw" cost is 2, "brne" 2. "call"'s cost is already accounted.
-
-    16 ?
-
-      One microsecond is 16 ticks at 16 MHz
-
-    So
-
-      Num runs = Num micros * 16 / 20
-
-    There also should be setup cost time constant,
-    we're subtracting it.
+    Cycle iteration with call of DelayMicrosecond()
+    takes additional <CycleOverhead_Ticks>.
   */
 }
 
@@ -126,37 +121,24 @@ void me_Delays::Init()
 
 /*
   Delay for duration record
+
+  Granularity is one millisecond. (Precision of GetTime().)
 */
 TBool me_Delays::Delay_Duration(
   me_Duration::TDuration Duration
 )
 {
-  me_Duration::TDuration CurTime;
-  me_Duration::TDuration EndTime_Trimmed;
-  TUint_2 EndTime_Micros;
+  me_Duration::TDuration EndTime;
 
-  const me_Duration::TDuration OneMilli = { 0, 0, 1, 0 };
+  Duration.MicroS = 0;
 
-  if (me_Duration::IsLess(Duration, OneMilli))
-    return Delay_Us(Duration.MicroS);
-
-  CurTime = me_RunTime::GetTime_Precise();
-
-  EndTime_Trimmed = CurTime;
-  if (!me_Duration::Add(&EndTime_Trimmed, Duration))
+  EndTime = me_RunTime::GetTime();
+  if (!me_Duration::Add(&EndTime, Duration))
     return false;
-  EndTime_Micros = EndTime_Trimmed.MicroS;
-  EndTime_Trimmed.MicroS = 0;
 
-  while (me_Duration::IsLess(me_RunTime::GetTime(), EndTime_Trimmed));
+  while (me_Duration::IsLess(me_RunTime::GetTime(), EndTime));
 
-  CurTime = me_RunTime::GetTime_Precise();
-
-  // If we passed end time already, return true
-  if (CurTime.MicroS > EndTime_Micros)
-    return true;
-
-  return Delay_Us(EndTime_Micros - CurTime.MicroS);
+  return true;
 }
 
 /*
@@ -184,4 +166,5 @@ TBool me_Delays::Delay_S(
   2025-09-12
   2025-10-25
   2025-10-26
+  2025-10-27
 */
