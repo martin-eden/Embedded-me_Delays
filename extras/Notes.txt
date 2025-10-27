@@ -145,3 +145,12 @@
   But she'll be waiting you in Istanbul.
 
 ) 2025-10-24
+
+(
+  There is no sense in long delays without interrupts.
+  There is no sense in short delays with interrupts.
+
+  So there is no sense in delay function doing both long and
+  precise delay.
+
+) 2025-10-27
