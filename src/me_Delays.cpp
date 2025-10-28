@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-27
+  Last mod.: 2025-10-28
 */
 
 #include <me_Delays.h>
@@ -84,18 +84,13 @@ TBool me_Delays::Delay_Us(
     I'm sick and tired of GCC randomly encoding simple iteration
     at least two different ways.
   */
-  DelayMicrosecond();
   asm volatile
   (
     R"(
-      DataLoop_Start:
-
+      Start:
         call DelayMicrosecond
-
-      DataLoop_Next:
-
         sbiw %[NumRuns], 1
-        brne DataLoop_Start
+        brne Start
     )"
     : [NumRuns] "+w" (NumRuns)
   );
