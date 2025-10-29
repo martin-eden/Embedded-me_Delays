@@ -46,9 +46,9 @@ void DelayMicrosecond()
 /*
   Delay for given amount of microseconds
 
-  Minimum accepted microseconds: 3
+  Minimum accepted microseconds: 2
 */
-TBool me_Delays::Delay_Us(
+[[gnu::noinline]] TBool me_Delays::Delay_Us(
   TUint_2 NumMicros
 )
 {
@@ -58,7 +58,7 @@ TBool me_Delays::Delay_Us(
   */
 
   const TUint_1
-    SetupCost_Us = 3,
+    SetupCost_Us = 2,
     Micro_Ticks = 16,
     CycleOverhead_Ticks = 4;
 
