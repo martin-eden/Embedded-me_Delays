@@ -137,6 +137,34 @@ TBool me_Delays::Delay_Duration(
 }
 
 /*
+  Delay for duration record
+
+  It's still not perfect delay as we're not disabling interrupts.
+*/
+TBool me_Delays::Delay_PreciseDuration(
+  me_Duration::TDuration Duration
+)
+{
+  me_Duration::TDuration EndTime;
+  me_Duration::TDuration CurTime;
+  me_Duration::TDuration TimeRemained;
+
+  EndTime = me_RunTime::GetTime_Precise();
+  me_Duration::Add(&EndTime, Duration);
+
+  if (!Delay_Duration(Duration))
+    return false;
+
+  CurTime = me_RunTime::GetTime_Precise();
+
+  TimeRemained = EndTime;
+  if (!me_Duration::Subtract(&TimeRemained, CurTime))
+    return false;
+
+  return Delay_Us(me_Duration::DurationToMicros(TimeRemained));
+}
+
+/*
   Delay for given amount of milliseconds
 */
 TBool me_Delays::Delay_Ms(

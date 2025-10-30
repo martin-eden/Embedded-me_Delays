@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-09-27
+  Last mod.: 2025-10-30
 */
 
 #pragma once
@@ -33,12 +33,16 @@ namespace me_Delays
   // Seconds delay
   TBool Delay_S(TUint_2 NumSecs);
 
-  // Delay for duration record
+  // Delay for duration record, milli-second granularity. Cheap
   TBool Delay_Duration(me_Duration::TDuration Duration);
+
+  // Delay for duration record, micro-second granularity. Expensive
+  TBool Delay_PreciseDuration(me_Duration::TDuration Duration);
 }
 
 /*
   2025-08-21
   2025-10-25
   2025-10-27
+  2025-10-30
 */
