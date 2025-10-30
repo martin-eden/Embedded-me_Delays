@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-28
+  Last mod.: 2025-10-30
 */
 
 #include <me_Delays.h>
@@ -46,7 +46,7 @@ void DelayMicrosecond()
 /*
   Delay for given amount of microseconds
 
-  Minimum accepted microseconds: 2
+  Minimum accepted microseconds: 3
 */
 [[gnu::noinline]] TBool me_Delays::Delay_Us(
   TUint_2 NumMicros
