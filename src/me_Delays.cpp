@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-30
+  Last mod.: 2025-11-17
 */
 
 #include <me_Delays.h>
@@ -46,7 +46,7 @@ void DelayMicrosecond()
 /*
   Delay for given amount of microseconds
 
-  Minimum accepted microseconds: 3
+  Minimum accepted microseconds: 4
 */
 [[gnu::noinline]] TBool me_Delays::Delay_Us(
   TUint_2 NumMicros
@@ -74,6 +74,9 @@ void DelayMicrosecond()
   NumRuns =
     (TUint_4) (NumMicros - SetupCost_Us) *
       Micro_Ticks / (Micro_Ticks + CycleOverhead_Ticks);
+
+  if (NumRuns == 0)
+    return false;
 
   /*
     We need asm for
@@ -190,4 +193,5 @@ TBool me_Delays::Delay_S(
   2025-10-25
   2025-10-26
   2025-10-27
+  2025-11-17
 */
