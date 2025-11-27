@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-30
+  Last mod.: 2025-11-27
 */
 
 #pragma once
@@ -36,7 +36,7 @@ namespace me_Delays
   // Delay for duration record, milli-second granularity. Cheap
   TBool Delay_Duration(me_Duration::TDuration Duration);
 
-  // Delay for duration record, micro-second granularity. Expensive
+  // Delay for duration record, sub-milli-second granularity
   TBool Delay_PreciseDuration(me_Duration::TDuration Duration);
 }
 
