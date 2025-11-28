@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-11-17
+  Last mod.: 2025-11-28
 */
 
 #include <me_Delays.h>
@@ -131,8 +131,7 @@ TBool me_Delays::Delay_Duration(
   Duration.MicroS = 0;
 
   EndTime = me_RunTime::GetTime();
-  if (!me_Duration::Add(&EndTime, Duration))
-    return false;
+  me_Duration::CappedAdd(&EndTime, Duration);
 
   while (me_Duration::IsLess(me_RunTime::GetTime(), EndTime));
 
@@ -153,7 +152,7 @@ TBool me_Delays::Delay_PreciseDuration(
   me_Duration::TDuration TimeRemained;
 
   EndTime = me_RunTime::GetTime_Precise();
-  me_Duration::Add(&EndTime, Duration);
+  me_Duration::CappedAdd(&EndTime, Duration);
 
   if (!Delay_Duration(Duration))
     return false;
@@ -161,8 +160,7 @@ TBool me_Delays::Delay_PreciseDuration(
   CurTime = me_RunTime::GetTime_Precise();
 
   TimeRemained = EndTime;
-  if (!me_Duration::Subtract(&TimeRemained, CurTime))
-    return false;
+  me_Duration::CappedSub(&TimeRemained, CurTime);
 
   return Delay_Us(me_Duration::DurationToMicros(TimeRemained));
 }
