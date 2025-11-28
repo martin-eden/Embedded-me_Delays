@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-11-27
+  Last mod.: 2025-11-28
 */
 
 #pragma once
@@ -25,19 +25,19 @@ namespace me_Delays
   void Init();
 
   // Microseconds delay
-  TBool Delay_Us(TUint_2 NumMicros);
+  void Delay_Us(TUint_2 NumMicros);
 
   // Milliseconds delay
-  TBool Delay_Ms(TUint_2 NumMillis);
+  void Delay_Ms(TUint_2 NumMillis);
 
   // Seconds delay
-  TBool Delay_S(TUint_2 NumSecs);
+  void Delay_S(TUint_2 NumSecs);
 
   // Delay for duration record, milli-second granularity. Cheap
-  TBool Delay_Duration(me_Duration::TDuration Duration);
+  void Delay_Duration(me_Duration::TDuration Duration);
 
   // Delay for duration record, sub-milli-second granularity
-  TBool Delay_PreciseDuration(me_Duration::TDuration Duration);
+  void Delay_PreciseDuration(me_Duration::TDuration Duration);
 }
 
 /*
@@ -45,4 +45,5 @@ namespace me_Delays
   2025-10-25
   2025-10-27
   2025-10-30
+  2025-11-28 Delays are void functions now
 */

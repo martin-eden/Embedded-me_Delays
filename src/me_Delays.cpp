@@ -47,8 +47,9 @@ void DelayMicrosecond()
   Delay for given amount of microseconds
 
   Minimum accepted microseconds: 4
+  Maximum accepted microseconds: 9999 (MaxCapacity)
 */
-[[gnu::noinline]] TBool me_Delays::Delay_Us(
+[[gnu::noinline]] void me_Delays::Delay_Us(
   TUint_2 NumMicros
 )
 {
@@ -65,10 +66,10 @@ void DelayMicrosecond()
   TUint_2 NumRuns;
 
   if (NumMicros <= SetupCost_Us)
-    return false;
+    return;
 
   if (NumMicros > MaxCapacity)
-    return false;
+    return;
 
   // See note at end of function
   NumRuns =
@@ -76,7 +77,7 @@ void DelayMicrosecond()
       Micro_Ticks / (Micro_Ticks + CycleOverhead_Ticks);
 
   if (NumRuns == 0)
-    return false;
+    return;
 
   /*
     We need asm for
@@ -97,8 +98,6 @@ void DelayMicrosecond()
     )"
     : [NumRuns] "+w" (NumRuns)
   );
-
-  return true;
 
   /*
     Call of DelayMicrosecond() takes <Micro_Ticks>.
@@ -122,7 +121,7 @@ void me_Delays::Init()
 
   Granularity is one millisecond. (Precision of GetTime().)
 */
-TBool me_Delays::Delay_Duration(
+void me_Delays::Delay_Duration(
   me_Duration::TDuration Duration
 )
 {
@@ -134,8 +133,6 @@ TBool me_Delays::Delay_Duration(
   me_Duration::CappedAdd(&EndTime, Duration);
 
   while (me_Duration::IsLess(me_RunTime::GetTime(), EndTime));
-
-  return true;
 }
 
 /*
@@ -143,7 +140,7 @@ TBool me_Delays::Delay_Duration(
 
   It's still not perfect delay as we're not disabling interrupts.
 */
-TBool me_Delays::Delay_PreciseDuration(
+void me_Delays::Delay_PreciseDuration(
   me_Duration::TDuration Duration
 )
 {
@@ -154,35 +151,34 @@ TBool me_Delays::Delay_PreciseDuration(
   EndTime = me_RunTime::GetTime_Precise();
   me_Duration::CappedAdd(&EndTime, Duration);
 
-  if (!Delay_Duration(Duration))
-    return false;
+  Delay_Duration(Duration);
 
   CurTime = me_RunTime::GetTime_Precise();
 
   TimeRemained = EndTime;
   me_Duration::CappedSub(&TimeRemained, CurTime);
 
-  return Delay_Us(me_Duration::DurationToMicros(TimeRemained));
+  Delay_Us(me_Duration::DurationToMicros(TimeRemained));
 }
 
 /*
   Delay for given amount of milliseconds
 */
-TBool me_Delays::Delay_Ms(
+void me_Delays::Delay_Ms(
   TUint_2 NumMillis
 )
 {
-  return Delay_Duration({ 0, 0, NumMillis, 0 });
+  Delay_Duration({ 0, 0, NumMillis, 0 });
 }
 
 /*
   Delay for given amount of seconds
 */
-TBool me_Delays::Delay_S(
+void me_Delays::Delay_S(
   TUint_2 NumSecs
 )
 {
-  return Delay_Duration({ 0, NumSecs, 0, 0 });
+  Delay_Duration({ 0, NumSecs, 0, 0 });
 }
 
 /*
