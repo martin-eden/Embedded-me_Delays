@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-11-28
+  Last mod.: 2025-11-30
 */
 
 #include <me_Delays.h>
@@ -147,6 +147,7 @@ void me_Delays::Delay_PreciseDuration(
   me_Duration::TDuration EndTime;
   me_Duration::TDuration CurTime;
   me_Duration::TDuration TimeRemained;
+  TUint_4 TimeRemained_Us;
 
   EndTime = me_RunTime::GetTime_Precise();
   me_Duration::CappedAdd(&EndTime, Duration);
@@ -158,7 +159,9 @@ void me_Delays::Delay_PreciseDuration(
   TimeRemained = EndTime;
   me_Duration::CappedSub(&TimeRemained, CurTime);
 
-  Delay_Us(me_Duration::DurationToMicros(TimeRemained));
+  me_Duration::DurationToMicros(&TimeRemained_Us, TimeRemained);
+
+  Delay_Us(TimeRemained_Us);
 }
 
 /*
