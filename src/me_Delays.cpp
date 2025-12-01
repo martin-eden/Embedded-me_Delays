@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-11-30
+  Last mod.: 2025-12-01
 */
 
 #include <me_Delays.h>
@@ -119,15 +119,13 @@ void me_Delays::Init()
 /*
   Delay for duration record
 
-  Granularity is one millisecond. (Precision of GetTime().)
+  Granularity is GetTime() tick duration.
 */
 void me_Delays::Delay_Duration(
   me_Duration::TDuration Duration
 )
 {
   me_Duration::TDuration EndTime;
-
-  Duration.MicroS = 0;
 
   EndTime = me_RunTime::GetTime();
   me_Duration::CappedAdd(&EndTime, Duration);
