@@ -119,7 +119,7 @@ void me_Delays::Init()
 /*
   Delay for duration record
 
-  Granularity is GetTime() tick duration.
+  Granularity is GetTime() period duration.
 */
 void me_Delays::Delay_Duration(
   me_Duration::TDuration Duration
@@ -146,11 +146,15 @@ void me_Delays::Delay_PreciseDuration(
   me_Duration::TDuration CurTime;
   me_Duration::TDuration TimeRemained;
   TUint_4 TimeRemained_Us;
+  me_Duration::TDuration RoughDuration;
+
+  RoughDuration = Duration;
+  me_Duration::CappedSub(&RoughDuration, me_RunTime::GetPeriodDuration());
 
   EndTime = me_RunTime::GetTime_Precise();
   me_Duration::CappedAdd(&EndTime, Duration);
 
-  Delay_Duration(Duration);
+  Delay_Duration(RoughDuration);
 
   CurTime = me_RunTime::GetTime_Precise();
 
