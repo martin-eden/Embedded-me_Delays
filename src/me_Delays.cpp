@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-12-01
+  Last mod.: 2025-12-09
 */
 
 #include <me_Delays.h>
@@ -135,13 +135,33 @@ void me_Delays::Delay_Duration(
 
 /*
   Delay for duration record
-
-  It's still not perfect delay as we're not disabling interrupts.
 */
 void me_Delays::Delay_PreciseDuration(
   me_Duration::TDuration Duration
 )
 {
+  /*
+    It's still not perfect delay as we're not disabling interrupts
+
+    But it's simple: we're splitting time interval into big and small
+    parts.
+
+    For big part we call Delay_Duration() which has no adverse effects.
+    For small part we're actualizing current time, converting remained
+    time to micros and call Delay_Us() which is precise.
+
+    We're losing some time doing conversions after getting precise
+    time. This can be compensated in outer code.
+
+    And anyway, even we return from here after spending exact requested
+    amount of time interrupt can occur and delay your important
+    TurnOff() function which typically follows.
+
+    For that stuff you currently have to write your own delay function
+    which turns off interrupts before getting precise delay for small
+    part. And then calling your TurnOff() before enabling interrupts
+    again. At moment of writing [me_ModulatedSignalPlayer] doing this.
+  */
   me_Duration::TDuration EndTime;
   me_Duration::TDuration CurTime;
   me_Duration::TDuration TimeRemained;
