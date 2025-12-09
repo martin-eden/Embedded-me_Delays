@@ -134,6 +134,19 @@ void me_Delays::Delay_S(
 }
 
 /*
+  Delay for given amount of kiloseconds
+*/
+void me_Delays::Delay_Ks(
+  TUint_2 NumKilos
+)
+{
+  TUint_2 RunNumber;
+
+  for (RunNumber = 1; RunNumber <= NumKilos; ++RunNumber)
+    Delay_S(1000);
+}
+
+/*
   Start run-time tracker that we're using
 */
 void me_Delays::Init()

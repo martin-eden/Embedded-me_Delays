@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-11-28
+  Last mod.: 2025-12-10
 */
 
 #pragma once
@@ -32,6 +32,9 @@ namespace me_Delays
 
   // Seconds delay
   void Delay_S(TUint_2 NumSecs);
+
+  // Kiloseconds delay
+  void Delay_Ks(TUint_2 NumKilos);
 
   // Delay for duration record, milli-second granularity. Cheap
   void Delay_Duration(me_Duration::TDuration Duration);
