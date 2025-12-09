@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-12-09
+  Last mod.: 2025-12-10
 */
 
 #include <me_Delays.h>
@@ -108,6 +108,32 @@ void DelayMicrosecond()
 }
 
 /*
+  Delay for given amount of milliseconds
+*/
+void me_Delays::Delay_Ms(
+  TUint_2 NumMillis
+)
+{
+  TUint_2 RunNumber;
+
+  for (RunNumber = 1; RunNumber <= NumMillis; ++RunNumber)
+    Delay_Us(1000);
+}
+
+/*
+  Delay for given amount of seconds
+*/
+void me_Delays::Delay_S(
+  TUint_2 NumSecs
+)
+{
+  TUint_2 RunNumber;
+
+  for (RunNumber = 1; RunNumber <= NumSecs; ++RunNumber)
+    Delay_Ms(1000);
+}
+
+/*
   Start run-time tracker that we're using
 */
 void me_Delays::Init()
@@ -187,30 +213,11 @@ void me_Delays::Delay_PreciseDuration(
 }
 
 /*
-  Delay for given amount of milliseconds
-*/
-void me_Delays::Delay_Ms(
-  TUint_2 NumMillis
-)
-{
-  Delay_Duration({ 0, 0, NumMillis, 0 });
-}
-
-/*
-  Delay for given amount of seconds
-*/
-void me_Delays::Delay_S(
-  TUint_2 NumSecs
-)
-{
-  Delay_Duration({ 0, NumSecs, 0, 0 });
-}
-
-/*
   2025-08-21
   2025-09-12
   2025-10-25
   2025-10-26
   2025-10-27
   2025-11-17
+  2025-12-10
 */
