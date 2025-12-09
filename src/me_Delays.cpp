@@ -8,9 +8,7 @@
 #include <me_Delays.h>
 
 #include <me_BaseTypes.h>
-
 #include <me_Duration.h>
-#include <me_RunTime.h>
 
 using namespace me_Delays;
 
@@ -147,82 +145,16 @@ void me_Delays::Delay_Ks(
 }
 
 /*
-  Start run-time tracker that we're using
-*/
-void me_Delays::Init()
-{
-  me_RunTime::Init();
-  me_RunTime::Start();
-}
-
-/*
   Delay for duration record
-
-  Granularity is GetTime() period duration.
 */
 void me_Delays::Delay_Duration(
   me_Duration::TDuration Duration
 )
 {
-  me_Duration::TDuration EndTime;
-
-  EndTime = me_RunTime::GetTime();
-  me_Duration::CappedAdd(&EndTime, Duration);
-
-  while (me_Duration::IsLess(me_RunTime::GetTime(), EndTime));
-}
-
-/*
-  Delay for duration record
-*/
-void me_Delays::Delay_PreciseDuration(
-  me_Duration::TDuration Duration
-)
-{
-  /*
-    It's still not perfect delay as we're not disabling interrupts
-
-    But it's simple: we're splitting time interval into big and small
-    parts.
-
-    For big part we call Delay_Duration() which has no adverse effects.
-    For small part we're actualizing current time, converting remained
-    time to micros and call Delay_Us() which is precise.
-
-    We're losing some time doing conversions after getting precise
-    time. This can be compensated in outer code.
-
-    And anyway, even we return from here after spending exact requested
-    amount of time interrupt can occur and delay your important
-    TurnOff() function which typically follows.
-
-    For that stuff you currently have to write your own delay function
-    which turns off interrupts before getting precise delay for small
-    part. And then calling your TurnOff() before enabling interrupts
-    again. At moment of writing [me_ModulatedSignalPlayer] doing this.
-  */
-  me_Duration::TDuration EndTime;
-  me_Duration::TDuration CurTime;
-  me_Duration::TDuration TimeRemained;
-  TUint_4 TimeRemained_Us;
-  me_Duration::TDuration RoughDuration;
-
-  RoughDuration = Duration;
-  me_Duration::CappedSub(&RoughDuration, me_RunTime::GetPeriodDuration());
-
-  EndTime = me_RunTime::GetTime_Precise();
-  me_Duration::CappedAdd(&EndTime, Duration);
-
-  Delay_Duration(RoughDuration);
-
-  CurTime = me_RunTime::GetTime_Precise();
-
-  TimeRemained = EndTime;
-  me_Duration::CappedSub(&TimeRemained, CurTime);
-
-  me_Duration::DurationToMicros(&TimeRemained_Us, TimeRemained);
-
-  Delay_Us(TimeRemained_Us);
+  Delay_Ks(Duration.KiloS);
+  Delay_S(Duration.S);
+  Delay_Ms(Duration.MilliS);
+  Delay_Us(Duration.MicroS);
 }
 
 /*
@@ -232,5 +164,5 @@ void me_Delays::Delay_PreciseDuration(
   2025-10-26
   2025-10-27
   2025-11-17
-  2025-12-10
+  2025-12-10 Removed run-time clock usage.
 */

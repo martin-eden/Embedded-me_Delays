@@ -13,16 +13,8 @@
 namespace me_Delays
 {
   /*
-    Max value for single-unit delay functions is 9999
-
-    For 9050 ms delay you can use "Delay_Ms(9050);" or
-    "Delay_S(9); Delay_Ms(50);".
-
-    But delay 10050 ms is done only by "Delay_S(10); Delay_Ms(50);".
+    Max guaranteed value for single-unit delay functions is 9999
   */
-
-  // Init
-  void Init();
 
   // Microseconds delay
   void Delay_Us(TUint_2 NumMicros);
@@ -36,11 +28,8 @@ namespace me_Delays
   // Kiloseconds delay
   void Delay_Ks(TUint_2 NumKilos);
 
-  // Delay for duration record, milli-second granularity. Cheap
+  // Delay for duration record
   void Delay_Duration(me_Duration::TDuration Duration);
-
-  // Delay for duration record, sub-milli-second granularity
-  void Delay_PreciseDuration(me_Duration::TDuration Duration);
 }
 
 /*

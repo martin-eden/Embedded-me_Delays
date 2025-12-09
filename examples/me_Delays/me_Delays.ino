@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-26
+  Last mod.: 2025-12-10
 */
 
 #include <me_Delays.h>
@@ -91,7 +91,6 @@ void RunInifiniteTest()
 void setup()
 {
   Console.Init();
-  me_Delays::Init();
 
   Console.Print("[me_Delays] test");
 

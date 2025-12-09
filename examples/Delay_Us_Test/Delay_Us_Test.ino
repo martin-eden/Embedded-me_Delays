@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-10-27
+  Last mod.: 2025-12-10
 */
 
 #include <me_Delays.h>
@@ -88,8 +88,6 @@ void setup()
   me_Menu::TMenu Menu;
 
   Console.Init();
-
-  me_Delays::Init();
 
   AddMenuItems(&Menu);
   Menu.AddBuiltinCommands();
