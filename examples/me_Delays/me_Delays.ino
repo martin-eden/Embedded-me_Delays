@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-12-10
+  Last mod.: 2025-12-27
 */
 
 #include <me_Delays.h>
@@ -68,9 +68,9 @@ void RunTest()
 */
 void RunInifiniteTest()
 {
-  const me_Duration::TDuration
-    On_Duration = { 0, 0, 20, 500 },
-    Off_Duration = { 0, 0, 10, 250 };
+  const TUint_4
+    On_Duration_Us = 20500,
+    Off_Duration_Us = 10250;
 
   me_Pins::TOutputPin OutputPin;
 
@@ -82,9 +82,9 @@ void RunInifiniteTest()
   while(1)
   {
     OutputPin.Write(1);
-    me_Delays::Delay_Duration(On_Duration);
+    me_Delays::Delay_Us(On_Duration_Us);
     OutputPin.Write(0);
-    me_Delays::Delay_Duration(Off_Duration);
+    me_Delays::Delay_Us(Off_Duration_Us);
   }
 }
 

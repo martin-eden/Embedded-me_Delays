@@ -2,17 +2,51 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-12-10
+  Last mod.: 2025-12-27
+*/
+
+// Implementation is fixed to 16 MHz, ATmega328
+
+/*
+  Composition
+
+    * One microsecond delay
+
+      Call of function, execution and return takes exactly 16 ticks
+
+    * TUint_2 microseconds delay
+
+      Calls microsecond delay from compensated cycle
+
+    * TUint_4 microseconds delay
+
+      Calls TUint_2-delay from uncompensated cycle
+*/
+
+/*
+  Notes
+
+    TUint_2 because we can subtract from word via SBIW.
+
+    I've tried to write just TUint_4 delay. But making it perfectly
+    precise is hard. Tho I think it's possible and maybe I can do it,
+    resulting code will be hard to understand.
+
+    So current approach is TUint_4 consisting from precise TUint_2
+    blocks.
+
+    Gaps between blocks are not compensated.
+
+    So delay is not perfect. Longer delays will give more overshoot.
+    Still, overshoot is maybe several milliseconds for minutes-range
+    delays. It's practical.
 */
 
 #include <me_Delays.h>
 
 #include <me_BaseTypes.h>
-#include <me_Duration.h>
 
 using namespace me_Delays;
-
-const TUint_2 MaxCapacity = 9999;
 
 /*
   Delay for one microsecond
@@ -42,18 +76,19 @@ void DelayMicrosecond()
 }
 
 /*
-  Delay for given amount of microseconds
+  Delay for given TUint_2 of microseconds
 
   Minimum accepted microseconds: 4
-  Maximum accepted microseconds: 9999 (MaxCapacity)
+
+  Delay is
 */
-[[gnu::noinline]] void me_Delays::Delay_Us(
+[[gnu::noinline]] static void Delay_Us_U2(
   TUint_2 NumMicros
 )
 {
   /*
-    For micros we're doing heavy correction in number of calls
-    to adjust for setup and cycle overhead.
+    We're doing correction in number of calls to adjust for setup cost
+    and cycle overhead.
   */
 
   const TUint_1
@@ -66,23 +101,16 @@ void DelayMicrosecond()
   if (NumMicros <= SetupCost_Us)
     return;
 
-  if (NumMicros > MaxCapacity)
-    return;
+  NumMicros = NumMicros - SetupCost_Us;
 
   // See note at end of function
   NumRuns =
-    (TUint_4) (NumMicros - SetupCost_Us) *
-      Micro_Ticks / (Micro_Ticks + CycleOverhead_Ticks);
+    (TUint_4) NumMicros * Micro_Ticks / (Micro_Ticks + CycleOverhead_Ticks);
 
   if (NumRuns == 0)
     return;
 
   /*
-    We need asm for
-
-      for (TUint_2 RunNumber = 1; RunNumber <= NumRuns; ++RunNumber)
-        Freetown::DelayMicrosecond();
-
     I'm sick and tired of GCC randomly encoding simple iteration
     at least two different ways.
   */
@@ -90,9 +118,9 @@ void DelayMicrosecond()
   (
     R"(
       Start:
-        call DelayMicrosecond
-        sbiw %[NumRuns], 1
-        brne Start
+        call DelayMicrosecond ; 4
+        sbiw %[NumRuns], 1 ; 2
+        brne Start ; 2
     )"
     : [NumRuns] "+w" (NumRuns)
   );
@@ -106,55 +134,50 @@ void DelayMicrosecond()
 }
 
 /*
-  Delay for given amount of milliseconds
+  Delay for given TUint_4 of microseconds
+*/
+void me_Delays::Delay_Us(
+  TUint_4 NumMicros
+)
+{
+  TUint_2 NumBlocks;
+  TUint_2 Remainder;
+
+  NumBlocks = (NumMicros >> 16L) & 0xFFFF;
+  Remainder = (NumMicros >> 0L) & 0xFFFF;
+
+  Delay_Us_U2(Remainder);
+
+  while (NumBlocks > 0)
+  {
+    Delay_Us_U2(TUint_2_Max);
+    --NumBlocks;
+  }
+}
+
+/*
+  [Handy] Milliseconds delay
 */
 void me_Delays::Delay_Ms(
   TUint_2 NumMillis
 )
 {
-  TUint_2 RunNumber;
-
-  for (RunNumber = 1; RunNumber <= NumMillis; ++RunNumber)
-    Delay_Us(1000);
+  Delay_Us(1000L * NumMillis);
 }
 
 /*
-  Delay for given amount of seconds
+  [Handy] Seconds delay
 */
 void me_Delays::Delay_S(
   TUint_2 NumSecs
 )
 {
-  TUint_2 RunNumber;
+  const TUint_2 MaxNumSecs = 3999;
 
-  for (RunNumber = 1; RunNumber <= NumSecs; ++RunNumber)
-    Delay_Ms(1000);
-}
+  if (NumSecs > MaxNumSecs)
+    NumSecs = MaxNumSecs;
 
-/*
-  Delay for given amount of kiloseconds
-*/
-void me_Delays::Delay_Ks(
-  TUint_2 NumKilos
-)
-{
-  TUint_2 RunNumber;
-
-  for (RunNumber = 1; RunNumber <= NumKilos; ++RunNumber)
-    Delay_S(1000);
-}
-
-/*
-  Delay for duration record
-*/
-void me_Delays::Delay_Duration(
-  me_Duration::TDuration Duration
-)
-{
-  Delay_Ks(Duration.KiloS);
-  Delay_S(Duration.S);
-  Delay_Ms(Duration.MilliS);
-  Delay_Us(Duration.MicroS);
+  Delay_Us(1000000L * NumSecs);
 }
 
 /*
@@ -164,5 +187,6 @@ void me_Delays::Delay_Duration(
   2025-10-26
   2025-10-27
   2025-11-17
-  2025-12-10 Removed run-time clock usage.
+  2025-12-10 Removed run-time clock usage
+  2025-12-27 Removed TDuration usage. TUint_4 delay instead
 */
