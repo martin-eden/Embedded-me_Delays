@@ -1,8 +1,8 @@
-// Test of microsecond delay. Verify with oscilloscope
+// [Tool] Test of microsecond delay. Verify with oscilloscope
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-12-10
+  Last mod.: 2025-12-28
 */
 
 #include <me_Delays.h>
@@ -16,7 +16,7 @@
 #include <avr/common.h>
 #include <avr/interrupt.h>
 
-static TUint_2 EmitDuration_Us = 350;
+static TUint_2 EmitDuration_Us = 600;
 static const TUint_1 OutputPinNum = 6;
 
 void SetDuration_Handler(
@@ -53,8 +53,13 @@ void Emit_Handler(
   TAddress Instance [[gnu::unused]]
 )
 {
+  const TUint_4 Compensation_Us = 43;
+
   me_Pins::TOutputPin OutputPin;
   TUint_1 OrigSreg;
+
+  if (EmitDuration_Us < Compensation_Us)
+    return;
 
   OutputPin.Init(OutputPinNum);
 
@@ -62,7 +67,7 @@ void Emit_Handler(
   cli();
 
   OutputPin.Write(1);
-  me_Delays::Delay_Us(EmitDuration_Us);
+  me_Delays::Delay_Us(EmitDuration_Us - Compensation_Us);
   OutputPin.Write(0);
 
   SREG = OrigSreg;
