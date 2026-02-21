@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2025-12-28
+  Last mod.: 2026-02-21
 */
 
 #include <me_Delays.h>
@@ -12,9 +12,7 @@
 #include <me_DebugPrints.h>
 #include <me_Menu.h>
 #include <me_Pins.h>
-
-#include <avr/common.h>
-#include <avr/interrupt.h>
+#include <me_Interrupts.h>
 
 static TUint_2 EmitDuration_Us = 600;
 static const TUint_1 OutputPinNum = 6;
@@ -56,21 +54,19 @@ void Emit_Handler(
   const TUint_4 Compensation_Us = 43;
 
   me_Pins::TOutputPin OutputPin;
-  TUint_1 OrigSreg;
 
   if (EmitDuration_Us < Compensation_Us)
     return;
 
   OutputPin.Init(OutputPinNum);
 
-  OrigSreg = SREG;
-  cli();
+  {
+    me_Interrupts::TInterruptsDisabler NoInts;
 
-  OutputPin.Write(1);
-  me_Delays::Delay_Us(EmitDuration_Us - Compensation_Us);
-  OutputPin.Write(0);
-
-  SREG = OrigSreg;
+    OutputPin.Write(1);
+    me_Delays::Delay_Us(EmitDuration_Us - Compensation_Us);
+    OutputPin.Write(0);
+  }
 }
 
 void AddMenuItems(
