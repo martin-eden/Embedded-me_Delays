@@ -2,11 +2,12 @@
 
 (2025-08)
 
-Time delays. ATmega328, 16 MHz.
+Time delays for Arduino Uno (ATmega328, 16 MHz).
 
-Interface provides functions for micro-, milli- and second time delay.
+Micro-, milli- and seconds time delay.
 
-Verified with oscilloscope. Implemented as wait loops.
+Implemented as wait loops. Microseconds delay is also compensated
+for code execution overhead. Verified with oscilloscope.
 
 ## Code
 
@@ -38,7 +39,7 @@ arduino-cli compile --fqbn arduino:avr:uno --quiet --warnings all . --build-prop
 
 [Interface]: src/me_Delays.h
 [Example]: examples/me_Delays/me_Delays.ino
-[Implementation]: src/
+[Implementation]: src/me_Delays.cpp
 
 [GetLibs]: https://github.com/martin-eden/Embedded-Framework-GetLibs
 
