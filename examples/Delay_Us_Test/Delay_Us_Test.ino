@@ -2,7 +2,7 @@
 
 /*
   Author: Martin Eden
-  Last mod.: 2026-02-21
+  Last mod.: 2026-04-13
 */
 
 #include <me_Delays.h>
@@ -18,7 +18,6 @@ static TUint_2 EmitDuration_Us = 600;
 static const TUint_1 OutputPinNum = 6;
 
 void SetDuration_Handler(
-  TAddress Data [[gnu::unused]],
   TAddress Instance [[gnu::unused]]
 )
 {
@@ -38,7 +37,6 @@ void SetDuration_Handler(
 }
 
 void GetDuration_Handler(
-  TAddress Data [[gnu::unused]],
   TAddress Instance [[gnu::unused]]
 )
 {
@@ -47,7 +45,6 @@ void GetDuration_Handler(
 }
 
 void Emit_Handler(
-  TAddress Data [[gnu::unused]],
   TAddress Instance [[gnu::unused]]
 )
 {
